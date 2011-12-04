@@ -1,8 +1,9 @@
 module Bezier (bezier) where
 
+-- point of arbitary dimension is just a list of coordinates:
 type Point = []
 
--- parametric line between two points of arbitrary dimension:
+-- parametric line between two points:
 line :: Num a => Point a -> Point a -> a -> Point a
 line p q t = map interpolate (zip p q)
   where interpolate (a, b) = (1 - t)*a + t*b
