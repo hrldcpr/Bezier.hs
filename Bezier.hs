@@ -1,6 +1,6 @@
 module Bezier (bezier) where
 
--- point of arbitary dimension is just a list of coordinates:
+-- point of arbitrary dimension is just a list of coordinates:
 type Point = []
 
 -- parametric line between two points:
