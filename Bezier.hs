@@ -5,8 +5,8 @@ type Point = []
 
 -- parametric line between two points:
 line :: Num a => Point a -> Point a -> a -> Point a
-line p q t = map interpolate (zip p q)
-  where interpolate (a, b) = (1 - t)*a + t*b
+line p q t = zipWith interpolate p q
+  where interpolate a b = (1 - t)*a + t*b
 
 -- bezier of just one point is fixed at that point,
 -- and bezier of a list of points is just linear interpolation between
