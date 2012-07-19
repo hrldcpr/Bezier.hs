@@ -27,5 +27,5 @@ bezierCurve :: (Enum a, Fractional a) => [Point a] -> a -> [Point a]
 bezierCurve [] _ = []
 bezierCurve [p] _ = [p]
 bezierCurve ps n = 
-    let step = 1 / n
+    let step = 1 / (n - 1)
     in map (bezier ps) [0, step..1]
