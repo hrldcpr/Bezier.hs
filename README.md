@@ -20,3 +20,10 @@ path from t=0 to t=1:
       [0.84375,0.5625]
     >> squareCurve 1.0
       [1.0,0.0]
+
+Alternatively you can use bezierCurve function which works similarly to bezier.
+The difference is that instead of specifying a moment in time, you have to specify a number
+of points you want from a curve:
+
+    >> bezierCurve [[1,1],[5,5]] 3
+      [[1.0,1.0],[3.0,3.0],[5.0,5.0]]
