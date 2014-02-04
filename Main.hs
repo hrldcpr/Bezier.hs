@@ -7,20 +7,21 @@ bezier2d ps t =
   let [x, y] = bezier [[x, y] | (x, y) <- ps] t
   in (x, y)
 
-data World = World {points :: [Point], time :: Float, depth :: Int}
+data World = World {points :: [Point], time :: Float, depth :: Int, verbose :: Bool}
 
-initialWorld = World [(-400, -400), (-400, 400)] 0 0
+initialWorld = World [(-400, -400), (-400, 400)] 0 0 False
 
 main =
   play (InWindow "Bézier" (1000, 1000) (0,  0))
        black 50 initialWorld
        picture touched next
 
-next dt (World ps t d) = World ps (t + dt) d
+next dt (World ps t d v) = World ps (t + dt) d v
 
-touched (EventKey (MouseButton LeftButton) Down _ p) (World ps t d) = World (ps ++ [p]) t d
-touched (EventKey (SpecialKey KeyUp) Down _ _) (World ps t d) = World ps t (d + 1)
-touched (EventKey (SpecialKey KeyDown) Down _ _) (World ps t d) = World ps t (d - 1)
+touched (EventKey (MouseButton LeftButton) Down _ p) (World ps t d v) = World (ps ++ [p]) t d v
+touched (EventKey (SpecialKey KeyUp) Down _ _) (World ps t d v) = World ps t (d + 1) v
+touched (EventKey (SpecialKey KeyDown) Down _ _) (World ps t d v) = World ps t (d - 1) v
+touched (EventKey (SpecialKey KeySpace) Down _ _) (World ps t d v) = World ps t d (not v)
 touched _ world = world
 
 dim' c = let
@@ -29,8 +30,8 @@ dim' c = let
   in
      makeColor (r / k) (g / k) (b / k) a
 
-picture (World ps t d) = Pictures [
-      go green blue d ps,
+picture (World ps t d v) = Pictures [
+      go blue green d ps,
       Color white $ Line $ map c ts,
       Color white $ Pictures $ [Translate x y $ ThickCircle w r | (x, y) <- ps]
     ]
@@ -51,8 +52,8 @@ picture (World ps t d) = Pictures [
       in Pictures [
           go' (init ps),
           go' (tail ps),
-          Color white $ Line $ map a ts,
-          Color white $ Line $ map b ts,
+          if (v || d == 1) then (Color white $ Line $ map a ts) else Blank,
+          if (v || d == 1) then (Color white $ Line $ map b ts) else Blank,
           Color blue $ Line [a t', b t'],
           Color blue $ Translate ((1 - t')*ax + t'*bx) ((1 - t')*ay + t'*by) $ ThickCircle w r
         ]
