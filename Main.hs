@@ -11,7 +11,7 @@ bezier2d ps t =
 
 data World = World {points :: [Point], time :: Float, depth :: Int, verbose :: Bool, animating :: Bool}
 
-initialWorld = World [(-400, -400)] 0 1 False True
+initialWorld = World [(-400, -400)] 0 0 False True
 
 main =
   play (InWindow "Bézier" (1000, 1000) (0,  0))
@@ -39,7 +39,8 @@ picture (World ps t d v a) = Pictures [
       go blue green d ps,
       Color white $ Line $ map c ts,
       Color white $ Pictures $ [Translate x y $ ThickCircle w r | (x, y) <- ps],
-      Color green $ Translate 0 300 $ Scale 0.3 0.3 $ Text $ printf "t=%.1f" t'
+      Color green $ Translate 0 300 $ Scale 0.3 0.3 $ Text $ printf "t=%.1f" t',
+      Color green $ Translate cx cy $ ThickCircle w r
     ]
   where
     w = 2
@@ -47,6 +48,7 @@ picture (World ps t d v a) = Pictures [
     c = bezier2d ps
     ts = [0, 0.01 .. 1]
     t' = (1 + cos t) / 2
+    (cx, cy) = c t'
     go _ _ 0 _ = Blank
     go _ _ _ [_] = Blank
     go curveColor lineColor d ps = let
