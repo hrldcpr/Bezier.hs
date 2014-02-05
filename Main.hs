@@ -11,10 +11,10 @@ bezier2d ps t =
 
 data World = World {points :: [Point], time :: Float, depth :: Int, verbose :: Bool, animating :: Bool}
 
-initialWorld = World [(-400, -400)] 0 0 False True
+initialWorld = World [(-200, -200)] 0 0 False True
 
 main =
-  play (InWindow "Bézier" (1000, 1000) (0,  0))
+  play (InWindow "Bézier" (600, 600) (0,  0))
        black 50 initialWorld
        picture touched next
 
@@ -39,7 +39,7 @@ picture (World ps t d v a) = Pictures [
       go blue green d ps,
       Color white $ Line $ map c ts,
       Color white $ Pictures $ [Translate x y $ ThickCircle w r | (x, y) <- ps],
-      Color green $ Translate 0 300 $ Scale 0.3 0.3 $ Text $ printf "t=%.1f" t',
+      Color green $ Translate 0 200 $ Scale 0.3 0.3 $ Text $ printf "t=%.1f" t',
       Color green $ Translate cx cy $ ThickCircle w r
     ]
   where
