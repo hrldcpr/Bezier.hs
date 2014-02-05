@@ -1,3 +1,4 @@
+module Bezier2d (bezier) where
 
 interpolate a b t = (1 - t)*a + t*b
 
