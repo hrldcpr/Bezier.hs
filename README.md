@@ -23,7 +23,7 @@ path from t=0 to t=1:
 
 To run the graphical version, `cabal install gloss` (which may require `brew install llvm` first, I can't remember...) And then:
 
-    ghc Bezier.hs Main.hs
-    ./Main
+    > ghc Bezier.hs Main.hs
+    > ./Main
 
 Click to add a point, 'd' to delete it, space to pause, up and down to increase level of detail, and 'v' to toggle whether sub-curves are drawn.
