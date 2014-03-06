@@ -27,3 +27,5 @@ To run the graphical version, `cabal install gloss` (which may require `brew ins
     > ./Main
 
 Click to add a point, 'd' to delete it, space to pause, up and down to increase level of detail, and 'v' to toggle whether sub-curves are drawn.
+
+![Life](http://cdn.gifbay.com/2013/01/not_sure_what_to_say-22072.gif)
