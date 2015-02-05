@@ -1,19 +1,16 @@
 module Bezier (bezier) where
 
--- point of arbitrary dimension is just a list of coordinates:
-type Point = []
+type Point = [Float]
+type Curve = Float -> Point
 
--- parametric line between two points:
-line :: Num a => Point a -> Point a -> a -> Point a
-line p q t = zipWith interpolate p q
-  where interpolate a b = (1 - t)*a + t*b
+-- bezier of one point is fixed at that point, and bezier of N points is interpolation
+-- between bezier of first N-1 points and bezier of last N-1 points:
+bezier :: [Point] -> Curve
+bezier [p] = const p
+bezier ps  = interpolation (bezier $ init ps) (bezier $ tail ps)
 
--- bezier of just one point is fixed at that point,
--- and bezier of a list of points is just linear interpolation
--- between bezier of the initial part of the list
--- and bezier of the tail of the list:
-bezier :: Num a => [Point a] -> a -> Point a
-bezier [p] t = p
-bezier ps  t = line (bezier (init ps) t)
-                    (bezier (tail ps) t)
-                    t
+-- linear interpolation between two curves:
+-- TODO make this point-free, a la http://stackoverflow.com/questions/4333864/trick-for-reusing-arguments-in-haskell
+interpolation :: Curve -> Curve -> Curve
+interpolation f g t = zipWith go (f t) (g t)
+  where go a b = (1 - t)*a + t*b
