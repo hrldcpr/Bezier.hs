@@ -1,17 +1,22 @@
 module Bezier (bezier) where
 
-import Control.Applicative
+import Control.Monad (zipWithM)
 
-type Time = Float
 type Point = [Float]
+type Parametric a = Float -> a
 
--- bezier of one point is fixed at that point, and bezier of N points is the linear
+-- Bezier one point is fixed at that point, and bezier of N points is the linear
 -- interpolation between bezier of first N-1 points and bezier of last N-1 points:
-bezier :: [Point] -> Time -> Point
+bezier :: [Point] -> Parametric Point
 bezier [p] = const p
-bezier ps  = interpolate <*> (bezier $ init ps) <*> (bezier $ tail ps)
+bezier ps  = do l <- bezier (init ps)
+                r <- bezier (tail ps)
+                line l r
 
--- linear interpolation between two points:
-interpolate :: Time -> Point -> Point -> Point
-interpolate t p q = zipWith go p q
-  where go a b = (1 - t)*a + t*b
+-- line between two points:
+line :: Point -> Point -> Parametric Point
+line p q = zipWithM line1d p q
+
+-- linear interpolation between two numbers:
+line1d :: Float -> Float -> Parametric Float
+line1d a b = \t -> (1 - t)*a + t*b
