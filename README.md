@@ -1,5 +1,7 @@
 Bezier.hs is a quick demonstration of how simple Bezier curves are, and how easily you can implement them in Haskell.
 
+*TODO put an animated screenshot in this readme.**
+
 *TODO compare functional, applicative, and monadic implementations, they're all cool.*
 
 For example, to play with the Bezier curve on the four points of the unit square you would run:
