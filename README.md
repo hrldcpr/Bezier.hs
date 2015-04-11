@@ -1,14 +1,13 @@
-Bezier.hs is a quick demonstration of how simple Bezier curves are, and how
-easily you can implement them in Haskell.
+Bezier.hs is a quick demonstration of how simple Bezier curves are, and how easily you can implement them in Haskell.
+
+*TODO compare functional, applicative, and monadic implementations, they're all cool.*
 
 For example, to play with the Bezier curve on the four points of the unit square you would run:
 
-    > ghci
-    >> :l Bezier.hs
+    > ghci Bezier.hs
     >> let squareCurve = bezier [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]]
 
-And then you can see where the curve is at various points along its
-path from t=0 to t=1:
+And then you can see where the curve is at various points along its path from t=0 to t=1:
 
     >> squareCurve 0.0
       [0.0,0.0]
