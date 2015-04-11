@@ -5,7 +5,7 @@ import Control.Monad (zipWithM)
 type Point = [Float]
 type Parametric a = Float -> a
 
--- Bezier one point is fixed at that point, and bezier of N points is the linear
+-- bezier of one point is fixed at that point, and bezier of N points is the linear
 -- interpolation between bezier of first N-1 points and bezier of last N-1 points:
 bezier :: [Point] -> Parametric Point
 bezier [p] = const p
