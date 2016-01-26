@@ -1,4 +1,7 @@
-Bezier.hs is a quick demonstration of how simple Bezier curves are, and how easily you can implement them in Haskell.
+# Bezier.hs
+![animated screenshot](https://x.st/images/bezier.gif)
+
+A quick demonstration of how simple Bezier curves are, and how easily you can implement them in Haskell.
 
 For example, to play with the Bezier curve on the four points of the unit square you would run:
 
