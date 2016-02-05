@@ -2,11 +2,8 @@ module Bezier where
 
 import Control.Monad (zipWithM)
 
--- a multi-dimensional coordinate
-type Point = [Float]
-
--- a value that varies over time
-type Parametric a = Float -> a
+type Point = [Float]  -- a multi-dimensional coordinate
+type Parametric a = Float -> a  -- a value that varies over time
 
 -- linear interpolation between two numbers, from t=0 to t=1
 line1d :: Float -> Float -> Parametric Float
