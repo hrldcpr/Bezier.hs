@@ -1,22 +1,25 @@
-module Bezier (bezier) where
+module Bezier where
 
 import Control.Monad (zipWithM)
 
+-- a multi-dimensional coordinate:
 type Point = [Float]
+
+-- a value that varies over time:
 type Parametric a = Float -> a
 
--- bezier of one point is fixed at that point, and bezier of N points is the linear
--- interpolation between bezier of first N-1 points and bezier of last N-1 points:
-bezier :: [Point] -> Parametric Point
-bezier [p] = const p
-bezier ps  = do l <- bezier (init ps)
-                r <- bezier (tail ps)
-                line l r
+-- linear interpolation between two numbers, from t=0 to t=1:
+line1d :: Float -> Float -> Parametric Float
+line1d a b = \t -> (1 - t)*a + t*b
 
--- line between two points:
+-- line between two points is linear interpolation on each dimension:
 line :: Point -> Point -> Parametric Point
 line p q = zipWithM line1d p q
 
--- linear interpolation between two numbers:
-line1d :: Float -> Float -> Parametric Float
-line1d a b = \t -> (1 - t)*a + t*b
+-- bezier of one point is fixed at that point, and bezier of n points is the
+-- line between bezier of first n-1 points and bezier of last n-1 points:
+bezier :: [Point] -> Parametric Point
+bezier [p] = const p
+bezier ps  = do p <- bezier (init ps)
+                q <- bezier (tail ps)
+                line p q
