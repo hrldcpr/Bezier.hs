@@ -10,7 +10,7 @@ It turns out we can, and it's called a Bézier curve.
 
 Let's start with the usual line between two points.
 
-Given the one-dimensional `line1d` between a number *a* at `Time` *t=0* to a number *b* at *t=1*, then the multi-dimensional `line` between two `Point`s is the combination of the one-dimensional lines on each dimension:
+Given the one-dimensional `line1d` from a number *a* at `Time` *t=0* to a number *b* at *t=1*, the multi-dimensional `line` between two points *p* and *q* is the combination of the one-dimensional lines on each dimension:
 ```haskell
 type Time = Float
 type Point = [Float]
@@ -121,6 +121,71 @@ bezier :: [Point] -> Curve
 bezier [p] = const p
 bezier ps  = linear (bezier (init ps)) (bezier (tail ps))
 ```
+
+This seems fine, but `linear` is quite specialized. What if we just want to use a standard `line` between two points, can we still write `bezier` in a nice way?
+
+We'll start off simple and improve it:
+```haskell
+type Time = Float
+type Point = [Float]
+type Curve = Time -> Point
+
+line :: Point -> Point -> Curve
+line p q t = zipWith line1d p q
+  where line1d a b = (1 - t)*a + t*b
+
+bezier :: [Point] -> Curve
+bezier [p] t = p
+bezier ps  t = line (bezier (init ps) t) (bezier (tail ps) t) t
+```
+Not terrible, but we end up referencing `t` a bunch of times. It turns out there's a way to pass `t` around implicitly, using the *function monad*. Since `Curve` is already a function, we don't even have to use any different types:
+```haskell
+type Time = Float
+type Point = [Float]
+type Curve = Time -> Point
+
+line :: Point -> Point -> Curve
+line p q t = zipWith line1d p q
+  where line1d a b = (1 - t)*a + t*b
+
+bezier :: [Point] -> Curve
+bezier [p] = const p
+bezier ps  = do p <- bezier (init ps)
+                q <- bezier (tail ps)
+                line p q
+```
+
+We can actually take this a step further, because the monad is `(Time ->)`, so `line1d` is also in the monad, even though its output is `Float` whereas the other functions output `Point`. So, making the function monad explicit as any `Parametric` function from `Time`, we get:
+```haskell
+import Control.Monad (zipWithM)
+
+type Time = Float
+type Point = [Float]
+type Parametric a = Time -> a
+
+line1d :: Float -> Float -> Parametric Float
+line1d a b = \t -> (1 - t)*a + t*b
+
+line :: Point -> Point -> Parametric Point
+line p q = zipWithM line1d p q
+
+bezier :: [Point] -> Parametric Point
+bezier [p] = const p
+bezier ps  = do p <- bezier (init ps)
+                q <- bezier (tail ps)
+                line p q
+```
+I like this way because both `line` and `bezier` are point-free—i.e. don't mention *t* at all—and all three functions operate in the same `Parametric` monad, and are useful independent building blocks.
+
+Just for fun, a completely equivalent way to write `bezier` using applicative functor operators:
+```haskell
+bezier :: [Point] -> Parametric Point
+bezier [p] = const p
+bezier ps  = join $ line <$> bezier (init ps) <*> bezier (tail ps)
+```
+The `join` is unfortunate though, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery.
+
+Note that in the function monad, `const` and `pure` and `return` are all the exact same thing, so we could have written it with any of these. To me `const` is clearest, though `pure` sounds coolest.
 
 
 # Bezier.hs
