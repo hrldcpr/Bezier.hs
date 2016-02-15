@@ -1,4 +1,4 @@
-# Lines of Lines / Bézier Curves in Haskell
+# Lines of Lines, Bézier Curves, and Haskell's Function Monad
 ![animated screenshot](https://x.st/images/bezier.gif)
 
 A line usually goes from one point to another, but can we draw a line from one line to another?
@@ -105,7 +105,7 @@ Now we can make crazy curves through a bunch of points:
 ![animation of the example curve](TODO)
 
 
-## Refactoring
+## Parametric Functions are a Monad
 
 So far the code looks like this:
 ```haskell
@@ -177,13 +177,13 @@ bezier ps  = do p <- bezier (init ps)
 ```
 I like this way because both `line` and `bezier` are point-free—i.e. don't mention *t* at all—and all three functions operate in the same `Parametric` monad, and are useful independent building blocks.
 
-Just for fun, a completely equivalent way to write `bezier` using applicative functor operators:
+Just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
 ```haskell
 bezier :: [Point] -> Parametric Point
 bezier [p] = const p
 bezier ps  = join $ line <$> bezier (init ps) <*> bezier (tail ps)
 ```
-The `join` is unfortunate though, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery.
+The `join` is unfortunate, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery.
 
 Note that in the function monad, `const` and `pure` and `return` are all the exact same thing, so we could have written it with any of these. To me `const` is clearest, though `pure` sounds coolest.
 
