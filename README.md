@@ -156,8 +156,8 @@ Both `line` and `bezier` are now point-free—i.e. they don't mention *t* at all
 The base case of `bezier` is still just a constant function, but in the function monad that's equivalent to `return`, so we use `return` instead of `const` to keep things purely monadic, which lets us switch to a different monad if we want to, without changing any code.
 
 
+## A Different Monad
 
-## Switching to a Different Monad
 `line` and `bezier` are implemented in an entirely monad-independent way, which means we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
 
 Suppose we want `line1d` to do nothing if *t < 0* or *t > 1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper turning `Time -> Maybe a` into one combined monad instead of two nested ones:
@@ -182,7 +182,9 @@ Just [3, 0]
 Nothing
 ```
 
-## Refactoring Using Applicative Functor Operators
+
+## Applicative Functor Operators
+
 Every monad is also an applicative functor, so just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
 ```haskell
 bezier :: [Point] -> Parametric Point
