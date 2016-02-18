@@ -220,12 +220,10 @@ Nothing
 Every monad is also an applicative functor, so just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
 ```haskell
 bezier :: [Point] -> Parametric Point
-bezier [p] = const p
+bezier [p] = return p
 bezier ps  = join $ line <$> bezier (init ps) <*> bezier (tail ps)
 ```
-The `join` is unfortunate, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery.
-
-Note that in the function monad, `const` and `pure` and `return` are all the exact same thing, so we could have written it with any of these. To me `const` is clearest, though `pure` sounds coolest.
+The `join` is unfortunate, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery. The fact that we have to resort to `join` also shows that `Parametric` is more than just an applicative functor, since purely applicative functors can't be joined, only monadic ones can.
 
 
 # Bezier.hs
