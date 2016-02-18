@@ -127,7 +127,7 @@ Notice that the return type of all of our functions is a parametric function fro
 
 It turns out `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions to get rid of most of the mentions of *t*:
 
-### The final implementation
+### The final implementation:
 ```haskell
 import Control.Monad (zipWithM)
 
