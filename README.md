@@ -49,6 +49,7 @@ Now we can see what a line between two lines looks like:
 [1, 1]
 λ> h 0.5
 -- TODO [x, y]
+```
 ![animation of the example lines](TODO)
 Cool!
 
