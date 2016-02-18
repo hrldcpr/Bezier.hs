@@ -104,7 +104,7 @@ Now we can make crazy curves through a bunch of points:
 ![animation of the example curve](TODO)
 
 
-## Refactoring Using the Function Monad
+## The Function Monad
 
 So far the code looks like this:
 ```haskell
@@ -121,54 +121,13 @@ bezier :: [Point] -> Time -> Point
 bezier [p] t = p
 bezier ps  t = line (bezier (init ps) t) (bezier (tail ps) t) t
 ```
-Not terrible, but we end up referencing *t* a bunch of times, even though everything other than `line1d` just passes it along untouched.
+It's not terrible, but we end up referencing *t* a bunch of times, even though everything other than `line1d` just passes it along untouched.
 
-It turns out there's a way to pass *t* around implicitly, using the *function monad*.
+Notice that the return type of all of our functions is a parametric function from time to some value. We can make this more apparent with a type alias `type Parametric a = Time -> a`.
 
-Notice that the return type of all of our functions is `Time -> a` for some type *a*. We can make this more apparent by using a type alias `Parametric` for these parametric functions of time:
-```haskell
-import Control.Monad (zipWithM)
+It turns out `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions to get rid of most of the mentions of *t*:
 
-type Time = Float
-type Point = [Float]
-type Parametric a = Time -> a
-
-line1d :: Float -> Float -> Parametric Float
-line1d a b = \t -> (1 - t)*a + t*b
-
-line :: Point -> Point -> Parametric Point
-line p q = \t -> [line1d a b t | (a, b) <- zip p q]
-
-bezier :: [Point] -> Parametric Point
-bezier [p] = \t -> p
-bezier ps  = \t -> line (bezier (init ps) t) (bezier (tail ps) t) t
-```
-This can help to get rid of most of the mentions of *t*, because `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions.
-
-`line1d` will remain unchanged, since it's actually using the value of *t*, not just passing it along.
-
-`line` can easily be refactored to create a list `[Parametric Float]` which can then be turned into the desired `Parametric [Float]` aka `Parametric Point`, using `sequence :: Monad m => [m a] -> m [a]`:
-```haskell
-line :: Point -> Point -> Parametric Point
-line p q = sequence [line1d a b | (a, b) <- zip p q]
-```
-But it turns out the list comprehension is equivalent to `zipWith line1d p q`, and even better, `zipWithM` is a built-in combination of `sequence` and `zipWith`:
-```haskell
-import Control.Monad (zipWithM)
-line :: Point -> Point -> Parametric Point
-line p q = zipWithM line1d p q
-```
-
-And lastly, `bezier` can be improved too. The base case is just a constant function, also known as `return` in the function monad, and the recursive case can be simplified with `do` notation:
-```haskell
-bezier :: [Point] -> Parametric Point
-bezier [p] = return p
-bezier ps  = do p <- bezier (init ps)
-                q <- bezier (tail ps)
-                line p q
-```
-
-**Putting it all together:**
+### The final implementation
 ```haskell
 import Control.Monad (zipWithM)
 
@@ -189,6 +148,14 @@ bezier ps  = do p <- bezier (init ps)
                 line p q
 ```
 Both `line` and `bezier` are now point-free—i.e. they don't mention *t* at all—the monadic machinery implicitly passes the time argument along until it is needed.
+
+`line1d` is unchanged because it's actually using the value of *t*, not just passing it along.
+
+`line` looks clever thanks to the built-in `zipWithM`, but it's just equivalent to `sequence $ zipWith line1d p q`, which is equivalent to `sequence [line1d a b | (a, b) <- zip p q]`, where `sequence` converts the list comprehension's `[Parametric Float]` to `Parametric [Float]`, aka `Parametric Point`.
+
+The base case of `bezier` is still just a constant function, but in the function monad that's equivalent to `return`, so we use `return` instead of `const` to keep things purely monadic, which lets us switch to a different monad if we want to, without changing any code.
+
+
 
 ## Switching to a Different Monad
 `line` and `bezier` are implemented in an entirely monad-independent way, which means we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
