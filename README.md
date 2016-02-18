@@ -85,7 +85,7 @@ What if we have four points?
 ![animation of the example lines](TODO)
 Crazy! This is what a Bézier curve is.
 
-We can generalize this process for any list of points, where the Beziér of a single point is fixed at that point, and the Beziér of *n* points is the line between the Beziér of the first *n-1* points (`init ps`) and the Beziér of the last *n-1* points (`tail ps`):
+We can generalize this process for any list of points, where the Bézier of a single point is fixed at that point, and the Bézier of *n* points is the line between the Bézier of the first *n-1* points (`init ps`) and the Bézier of the last *n-1* points (`tail ps`):
 ```haskell
 bezier :: [Point] -> Time -> Point
 bezier [p] t = p
