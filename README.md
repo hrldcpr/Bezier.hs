@@ -188,7 +188,7 @@ Nothing
 Every monad is also an applicative functor, so just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
 ```haskell
 bezier :: [Point] -> Parametric Point
-bezier [p] = return p
+bezier [p] = pure p
 bezier ps  = join $ line <$> bezier (init ps) <*> bezier (tail ps)
 ```
 The `join` is unfortunate, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery. The fact that we have to resort to `join` also shows that `Parametric` is more than just an applicative functor, since purely applicative functors can't be joined, only monadic ones can.
