@@ -8,7 +8,7 @@ It turns out we can, and it's called a Bézier curve.
 
 ## A Line Between Two Points
 
-Let's start with the usual line between two points.
+We'll start with the usual line between two points.
 
 Given the one-dimensional `line1d` from a number *a* at `Time` *t=0* to a number *b* at *t=1*, the multi-dimensional `line` between two points *p* and *q* is the combination of the one-dimensional lines on each dimension:
 ```haskell
@@ -38,17 +38,11 @@ So far so good!
 
 ## A Line Between Two Lines
 
-Let's make a line between *functions* instead of points:
-```haskell
-linear :: (Time -> Point) -> (Time -> Point) -> Time -> Point
-linear f g t = line (f t) (g t) t
-```
-
-Now we can finally see what a line between two lines looks like:
+Now we can see what a line between two lines looks like:
 ```haskell
 λ> let f = line [0, 0] [0, 1]
 λ> let g = line [1, 0] [1, 1]
-λ> let h = linear f g
+λ> let h t = line (f t) (g t) t
 λ> h 0
 [0, 0]
 λ> h 1
@@ -71,7 +65,7 @@ If we have three points, we can draw two lines to connect them together.
 
 But we know how to make a line between two lines:
 ```haskell
-λ> let l02 = linear l01 l12
+λ> let l02 t = line (l01 t) (l12 t) t
 ```
 ![animation of the example lines](TODO)
 
@@ -83,15 +77,15 @@ What if we have four points?
 λ> let l12 = line ps!!1 ps!!2
 λ> let l23 = line ps!!2 ps!!3
 
-λ> let l02 = linear l01 l12
-λ> let l13 = linear l12 l23
+λ> let l02 t = line (l01 t) (l12 t) t
+λ> let l13 t = line (l12 t) (l23 t) t
 
-λ> let l03 = linear l02 l13
+λ> let l03 t = line (l02 t) (l13 t) t
 ```
 ![animation of the example lines](TODO)
 Crazy! This is what a Bézier curve is.
 
-We can generalize this process for any list of points, where the Beziér of a single point is fixed at that point, and the Beziér of *n* points is the line between the Beziér of the first *n-1* points and the Beziér of the last n-1 points:
+We can generalize this process for any list of points, where the Beziér of a single point is fixed at that point, and the Beziér of *n* points is the line between the Beziér of the first *n-1* points (`init ps`) and the Beziér of the last *n-1* points (`tail ps`):
 ```haskell
 bezier :: [Point] -> Time -> Point
 bezier [p] t = p
@@ -126,7 +120,7 @@ Not terrible, but we end up referencing *t* a bunch of times, even though everyt
 
 It turns out there's a way to pass *t* around implicitly, using the *function monad*.
 
-Notice that the return type of all of our functions is `(Time -> a)` for some type *a*. Let's make this more apparent by using a type alias `Parametric` for these parametric functions of time:
+Notice that the return type of all of our functions is `Time -> a` for some type *a*. We can make this more apparent by using a type alias `Parametric` for these parametric functions of time:
 ```haskell
 import Control.Monad (zipWithM)
 
@@ -144,23 +138,23 @@ bezier :: [Point] -> Parametric Point
 bezier [p] = \t -> p
 bezier ps  = \t -> line (bezier (init ps) t) (bezier (tail ps) t) t
 ```
-Does this help us get rid of all of these mentions of *t*? It turns out it can, because `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions.
+This can help to get rid of most of the mentions of *t*, because `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions.
 
 `line1d` will remain unchanged, since it's actually using the value of *t*, not just passing it along.
 
-`line` can easily be re-written to return a list `[Parametric Float]` which can then be turned into the desired `Parametric [Float]` aka `Parametric Point`, using `sequence :: Monad m => [m a] -> m [a]`:
+`line` can easily be refactored to create a list `[Parametric Float]` which can then be turned into the desired `Parametric [Float]` aka `Parametric Point`, using `sequence :: Monad m => [m a] -> m [a]`:
 ```haskell
 line :: Point -> Point -> Parametric Point
 line p q = sequence [line1d a b | (a, b) <- zip p q]
 ```
-But it turns out we can do even better than that, because the list comprehension is equivalent to `zipWith line1d p q`, and even better `zipWithM` is a built-in combination of `sequence` and `zipWith`:
+But it turns out the list comprehension is equivalent to `zipWith line1d p q`, and even better, `zipWithM` is a built-in combination of `sequence` and `zipWith`:
 ```haskell
 import Control.Monad (zipWithM)
 line :: Point -> Point -> Parametric Point
 line p q = zipWithM line1d p q
 ```
 
-And finally, `bezier` can be improved too. The base case is just a constant function, so we can use `const`—or `return` to be more monadic—and the recursive case can be simplified with `do` notation:
+And lastly, `bezier` can be improved too. The base case is just a constant function, also known as `return` in the function monad, and the recursive case can be simplified with `do` notation:
 ```haskell
 bezier :: [Point] -> Parametric Point
 bezier [p] = return p
@@ -169,7 +163,7 @@ bezier ps  = do p <- bezier (init ps)
                 line p q
 ```
 
-Putting it all together:
+**Putting it all together:**
 ```haskell
 import Control.Monad (zipWithM)
 
@@ -192,9 +186,9 @@ bezier ps  = do p <- bezier (init ps)
 Both `line` and `bezier` are now point-free—i.e. they don't mention *t* at all—the monadic machinery implicitly passes the time argument along until it is needed.
 
 ## Switching to a Different Monad
-`line` and `bezier` are implemented in an entirely monad-independent way. In particular, the base case of `bezier` currently returns a constant function (the Bézier 'curve' of one point is fixed at that point), so we could have used `const` instead of `return`; they are the exact same thing in the function monad. Using `return`, however, allows the code to work with any monad, which is cool and potentially even useful: we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
+`line` and `bezier` are implemented in an entirely monad-independent way, which means we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
 
-Suppose we want `line1d` to do nothing if *t<0* or *t>1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper `(Time -> Maybe a)` as one combined monad instead of two nested ones:
+Suppose we want `line1d` to do nothing if *t < 0* or *t > 1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper turning `Time -> Maybe a` into one combined monad instead of two nested ones:
 ```haskell
 import Control.Monad.Trans.Maybe
 
@@ -205,14 +199,14 @@ line1d a b = MaybeT go
   where go t | t >= 0 && t <= 1 = Just $ (1 - t)*a + t*b
              | otherwise = Nothing
 ```
-The cool part is that we don't have to change our implementations of `line` and `bezier` *at all*!
+The cool part is that we don't have to change the implementation of `line` or `bezier` at all.
 
 We can try it out:
 ```haskell
 λ> let f = bezier [[0, 0], [1, 1], [2, 0], [1, 0], [2, 1], [3, 0]]
-λ> runMaybeT l 1
+λ> runMaybeT f 1
 Just [3, 0]
-λ> runMaybeT l 10
+λ> runMaybeT f 10
 Nothing
 ```
 
