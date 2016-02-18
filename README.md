@@ -10,13 +10,17 @@ It turns out we can, and it's called a Bézier curve.
 
 We'll start with the usual line between two points.
 
-Given the one-dimensional `line1d` from a number *a* at `Time` *t=0* to a number *b* at *t=1*, the multi-dimensional `line` between two points *p* and *q* is the combination of the one-dimensional lines on each dimension:
+First we define the 1-dimensional `line1d` from a number *a* at `Time` *t=0* to a number *b* at *t=1*:
 ```haskell
 type Time = Float
-type Point = [Float]
 
 line1d :: Float -> Float -> Time -> Float
 line1d a b t = (1 - t)*a + t*b
+```
+
+Then the multi-dimensional `line` between two points *p* and *q* is the combination of the one-dimensional lines on each dimension:
+```haskell
+type Point = [Float]
 
 line :: Point -> Point -> Time -> Point
 line p q t = [line1d a b t | (a, b) <- zip p q]
