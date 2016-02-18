@@ -191,7 +191,33 @@ bezier ps  = do p <- bezier (init ps)
 ```
 Both `line` and `bezier` are now point-free—i.e. they don't mention *t* at all—the monadic machinery implicitly passes the time argument along until it is needed.
 
-Just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
+## Switching to a Different Monad
+`line` and `bezier` are implemented in an entirely monad-independent way. In particular, the base case of `bezier` currently returns a constant function (the Bézier 'curve' of one point is fixed at that point), so we could have used `const` instead of `return`; they are the exact same thing in the function monad. Using `return`, however, allows the code to work with any monad, which is cool and potentially even useful: we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
+
+Suppose we want `line1d` to do nothing if *t<0* or *t>1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper `(Time -> Maybe a)` as one combined monad instead of two nested ones:
+```haskell
+import Control.Monad.Trans.Maybe
+
+type Parametric a = MaybeT ((->) Time) a
+
+line1d :: Float -> Float -> Parametric Float
+line1d a b = MaybeT go
+  where go t | t >= 0 && t <= 1 = Just $ (1 - t)*a + t*b
+             | otherwise = Nothing
+```
+The cool part is that we don't have to change our implementations of `line` and `bezier` *at all*!
+
+We can try it out:
+```haskell
+λ> let f = bezier [[0, 0], [1, 1], [2, 0], [1, 0], [2, 1], [3, 0]]
+λ> runMaybeT l 1
+Just [3, 0]
+λ> runMaybeT l 10
+Nothing
+```
+
+## Refactoring Using Applicative Functor Operators
+Every monad is also an applicative functor, so just for fun, here's a completely equivalent way to write `bezier` using applicative functor operators:
 ```haskell
 bezier :: [Point] -> Parametric Point
 bezier [p] = const p
