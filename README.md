@@ -10,7 +10,7 @@ It turns out we can, and it's called a Bézier curve.
 
 We'll start with the usual line between two points.
 
-First we define the 1-dimensional `line1d` from a number *a* at `Time` *t=0* to a number *b* at *t=1*:
+First we define the 1-dimensional `line1d` from a number *a* at time *t=0* to a number *b* at *t=1*:
 ```haskell
 type Time = Float
 
@@ -131,9 +131,8 @@ It turns out `Parametric` is a monad—specifically the *function monad*, for pa
 ```haskell
 import Control.Monad (zipWithM)
 
-type Time = Float
+type Parametric a = Float -> a
 type Point = [Float]
-type Parametric a = Time -> a
 
 line1d :: Float -> Float -> Parametric Float
 line1d a b = \t -> (1 - t)*a + t*b
@@ -151,7 +150,7 @@ Both `line` and `bezier` are now point-free—i.e. they don't mention *t* at all
 
 `line1d` is unchanged because it's actually using the value of *t*, not just passing it along.
 
-`line` looks clever thanks to the built-in `zipWithM`, but it's just equivalent to `sequence $ zipWith line1d p q`, which is equivalent to `sequence [line1d a b | (a, b) <- zip p q]`, where `sequence` converts the list comprehension's `[Parametric Float]` to `Parametric [Float]`, aka `Parametric Point`.
+`line` looks clever thanks to the built-in `zipWithM`, but that's just equivalent to `sequence $ zipWith line1d p q`, which is equivalent to `sequence [line1d a b | (a, b) <- zip p q]`, where `sequence` converts the list comprehension's `[Parametric Float]` to `Parametric [Float]`, aka `Parametric Point`.
 
 The base case of `bezier` is still just a constant function, but in the function monad that's equivalent to `return`, so we use `return` instead of `const` to keep things purely monadic, which lets us switch to a different monad if we want to, without changing any code.
 
@@ -160,11 +159,11 @@ The base case of `bezier` is still just a constant function, but in the function
 
 `line` and `bezier` are implemented in an entirely monad-independent way, which means we can change the underlying monad used in `line1d` without changing the code of `bezier` or `line` at all. Let's try it!
 
-Suppose we want `line1d` to do nothing if *t < 0* or *t > 1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper turning `Time -> Maybe a` into one combined monad instead of two nested ones:
+Suppose we want `line1d` to do nothing if *t < 0* or *t > 1*. To accomplish this we can wrap our existing monad in the `transformers` library's `MaybeT`,  a "monad transformer" wrapper turning `Float -> Maybe a` into one combined monad instead of two nested ones:
 ```haskell
 import Control.Monad.Trans.Maybe
 
-type Parametric a = MaybeT ((->) Time) a
+type Parametric a = MaybeT ((->) Float) a
 
 line1d :: Float -> Float -> Parametric Float
 line1d a b = MaybeT go
