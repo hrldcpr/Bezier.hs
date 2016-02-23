@@ -66,7 +66,7 @@
     window.requestAnimationFrame(animate);
   }
 
-  points = [[200, 200], [100, 500], [500, 500], [500, 100]];
+  points = [[300, 100], [100, 500], [100, 300], [500, 500], [500, 100]];
   window.requestAnimationFrame(animate);
 
 })(this, this.document);
