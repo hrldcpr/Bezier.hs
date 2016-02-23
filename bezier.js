@@ -27,31 +27,35 @@
     if (offset === undefined) offset = 0;
     if (length === undefined) length = points.length;
 
-    if (length === 1) return constant(points[offset]);
+    var c;
+    if (length === 1) c = constant(points[offset]);
+    else {
+      var a = draw(offset, length - 1);
+      var b = draw(offset + 1, length - 1);
+      c = linear(a, b);
 
-    var a = draw(offset, length - 1);
-    var b = draw(offset + 1, length - 1);
-    if (length > 2) {  // don't draw line if bezier already is one
-      var p = a(time);
-      var q = b(time);
+      if (length > 2) {  // don't draw line if bezier already is one
+        var p = a(time);
+        var q = b(time);
+        ctx.beginPath();
+        ctx.moveTo(p[0], p[1]);
+        ctx.lineTo(q[0], q[1]);
+        ctx.stroke();
+      }
+
       ctx.beginPath();
-      ctx.moveTo(p[0], p[1]);
-      ctx.lineTo(q[0], q[1]);
+      for (var t = 0; t < 1 + DT; t += DT) {
+        var p = c(t);
+        ctx.lineTo(p[0], p[1]);
+      }
       ctx.stroke();
     }
-
-    var c = linear(a, b);
-    ctx.beginPath();
-    for (var t = 0; t < 1 + DT; t += DT) {
-      var p = c(t);
-      ctx.lineTo(p[0], p[1]);
-    }
-    ctx.stroke();
 
     var l = c(time);
     ctx.beginPath();
     ctx.arc(l[0], l[1], 5, 0, 2 * Math.PI);
     ctx.fill();
+
     return c;
   }
 
