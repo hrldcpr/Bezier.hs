@@ -7,42 +7,57 @@
   }
 
   function linear(f, g) {
-    return function(t) {
+    var cache = [];
+    for (var k = 0; k <= N; k++) {
+      var t = k / N;
       var p = f(t);
       var q = g(t);
       var l = [];
       for (i in p) l[i] = (1 - t)*p[i] + t*q[i];
-      return l;
+      cache[k] = l;
+    }
+    return function(t) {
+      return cache[Math.round(t * N)];
     };
   }
 
-  var DT = 0.01;
+  var N = 100;
+  var DT = 1 / N;
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
 
   var points;
   var time;
+  var beziers = {};
   function draw(offset, length) {
     if (offset === undefined) offset = 0;
     if (length === undefined) length = points.length;
 
+    if (length === 0) return;
+
+    var a = draw(offset, length - 1);
+    var b = draw(offset + 1, length - 1);
+
+    var k = offset + ',' + length;
     var c;
-    if (length === 1) c = constant(points[offset]);
+    if (k in beziers) c = beziers[k];
     else {
-      var a = draw(offset, length - 1);
-      var b = draw(offset + 1, length - 1);
-      c = linear(a, b);
+      if (length === 1) c = constant(points[offset]);
+      else c = linear(a, b);
+      beziers[k] = c;
+    }
 
-      if (length > 2) {  // don't draw line if bezier already is one
-        var p = a(time);
-        var q = b(time);
-        ctx.beginPath();
-        ctx.moveTo(p[0], p[1]);
-        ctx.lineTo(q[0], q[1]);
-        ctx.stroke();
-      }
+    if (length > 2) {  // don't draw line if bezier already is one
+      var p = a(time);
+      var q = b(time);
+      ctx.beginPath();
+      ctx.moveTo(p[0], p[1]);
+      ctx.lineTo(q[0], q[1]);
+      ctx.stroke();
+    }
 
+    if (length > 1) {
       ctx.beginPath();
       for (var t = 0; t < 1 + DT; t += DT) {
         var p = c(t);
@@ -67,6 +82,7 @@
   }
 
   canvas.addEventListener('click', function(event) {
+    beziers = {};
     points.push([event.offsetX, event.offsetY]);
   });
 
