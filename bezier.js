@@ -7,22 +7,21 @@
   }
 
   function linear(f, g) {
-    var cache = [];
-    for (var k = 0; k <= N; k++) {
-      var t = k / N;
-      var p = f(t);
-      var q = g(t);
-      var l = [];
-      for (i in p) l[i] = (1 - t)*p[i] + t*q[i];
-      cache[k] = l;
-    }
+    var cache = {};
     return function(t) {
-      return cache[Math.round(t * N)];
+      var k = t.toFixed(3);
+      if (!(k in cache)) {
+        var p = f(t);
+        var q = g(t);
+        var l = [];
+        for (i in p) l[i] = (1 - t)*p[i] + t*q[i];
+        cache[k] = l;
+      }
+      return cache[k];
     };
   }
 
-  var N = 100;
-  var DT = 1 / N;
+  var DT = 0.01;
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -36,7 +35,7 @@
 
     if (length === 0) return;
 
-    var a = draw(offset, length - 1);
+    var a = draw(offset, length - 1);  // TODO if offset>0 then this part has already been drawn?
     var b = draw(offset + 1, length - 1);
 
     var k = offset + ',' + length;
@@ -82,7 +81,7 @@
   }
 
   canvas.addEventListener('click', function(event) {
-    beziers = {};
+    beziers = {};  // clear all caches
     points.push([event.offsetX, event.offsetY]);
   });
 
