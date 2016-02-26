@@ -125,7 +125,7 @@ It's not terrible, but we end up referencing *t* a bunch of times, even though e
 
 Notice that the return type of all of our functions is a parametric function from time to some value. We can make this more apparent with a type alias `type Parametric a = Time -> a`.
 
-It turns out `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation and its many monadic helper functions to get rid of most of the mentions of *t*:
+It turns out `Parametric` is a monad—specifically the *function monad*, for passing around an implicit argument—so we can use Haskell's monadic `do` notation ([remember](https://twitter.com/matthandlersux/status/703021939682516993): *do no tation can do no harm*) and its many monadic helper functions to get rid of most of the mentions of *t*:
 
 ### The final implementation:
 ```haskell
