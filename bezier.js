@@ -1,3 +1,9 @@
+
+// # calls = 2 * curves + 1 = n * (n - 1) + 1 = 3, 7, 13, 21, 31, …
+// # points = n + (n - 1) + … + 1 = n * (n + 1) / 2 = 3, 6, 10, 15, 21, …
+// # curves = (n - 1) + (n - 2) + … + 1 = (n - 1) * n / 2 = 1, 3, 6, 10, 15, …
+// # lines = (n - 2) + (n - 3) + … + 1 = (n - 2) * (n - 1) / 2 = 0, 1, 3, 6, 10, …
+
 (function(window, document, undefined) {
 
   function constant(x) {
@@ -29,17 +35,19 @@
   var points;
   var time;
   var beziers = {};
-  function draw(offset, length) {
+  function draw(offset, length, dupe) {
     if (offset === undefined) offset = 0;
     if (length === undefined) length = points.length;
 
-    if (length === 0) return;
-
-    var a = draw(offset, length - 1);  // TODO if offset>0 then this part has already been drawn?
-    var b = draw(offset + 1, length - 1);
-
     var k = offset + ',' + length;
-    var c;
+    var cached = k in beziers;
+    var a, b, c;
+
+    if (length > 1 && !(cached && dupe)) {
+      a = draw(offset, length - 1, dupe || offset > 0);
+      b = draw(offset + 1, length - 1, dupe);
+    }
+
     if (k in beziers) c = beziers[k];
     else {
       if (length === 1) c = constant(points[offset]);
@@ -47,28 +55,33 @@
       beziers[k] = c;
     }
 
-    if (length > 2) {  // don't draw line if bezier already is one
-      var p = a(time);
-      var q = b(time);
-      ctx.beginPath();
-      ctx.moveTo(p[0], p[1]);
-      ctx.lineTo(q[0], q[1]);
-      ctx.stroke();
-    }
-
-    if (length > 1) {
-      ctx.beginPath();
-      for (var t = 0; t < 1 + DT; t += DT) {
-        var p = c(t);
-        ctx.lineTo(p[0], p[1]);
+    if (!dupe) {
+      // don't draw line if bezier already is one
+      if (length > 2) {
+        var p = a(time);
+        var q = b(time);
+        ctx.beginPath();
+        ctx.moveTo(p[0], p[1]);
+        ctx.lineTo(q[0], q[1]);
+        // ctx.strokeStyle = 'green';
+        ctx.stroke();
       }
-      ctx.stroke();
-    }
 
-    var l = c(time);
-    ctx.beginPath();
-    ctx.arc(l[0], l[1], 5, 0, 2 * Math.PI);
-    ctx.fill();
+      if (length > 1) {
+        ctx.beginPath();
+        for (var t = 0; t < 1 + DT; t += DT) {
+          var p = c(t);
+          ctx.lineTo(p[0], p[1]);
+        }
+        // ctx.strokeStyle = 'black';
+        ctx.stroke();
+      }
+
+      var l = c(time);
+      ctx.beginPath();
+      ctx.arc(l[0], l[1], 4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
 
     return c;
   }
