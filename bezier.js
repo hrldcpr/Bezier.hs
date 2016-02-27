@@ -4,6 +4,13 @@
 // # curves = (n - 1) + (n - 2) + … + 1 = (n - 1) * n / 2 = 1, 3, 6, 10, 15, …
 // # lines = (n - 2) + (n - 3) + … + 1 = (n - 2) * (n - 1) / 2 = 0, 1, 3, 6, 10, …
 
+var showAllPoints = true;
+var showPoints = true;
+var showAllLines = true;
+var showLines = true;
+var showAllCurves = true;
+var showCurve = true;
+
 (function(window, document, undefined) {
 
   function constant(x) {
@@ -57,30 +64,31 @@
 
     if (!dupe) {
       // don't draw line if bezier already is one
-      if (length > 2) {
+      if ((showAllLines || (showLines && length === 2)) && length > 1 && !(showAllCurves && length === 2) && !(showCurve && points.length === 2)) {
         var p = a(time);
         var q = b(time);
         ctx.beginPath();
         ctx.moveTo(p[0], p[1]);
         ctx.lineTo(q[0], q[1]);
-        // ctx.strokeStyle = 'green';
         ctx.stroke();
       }
 
-      if (length > 1) {
+      if (showAllCurves || (showCurve && length === points.length)) {
         ctx.beginPath();
         for (var t = 0; t < 1 + DT; t += DT) {
           var p = c(t);
           ctx.lineTo(p[0], p[1]);
         }
-        // ctx.strokeStyle = 'black';
         ctx.stroke();
       }
 
-      var l = c(time);
-      ctx.beginPath();
-      ctx.arc(l[0], l[1], 4, 0, 2 * Math.PI);
-      ctx.fill();
+      if (showAllPoints || (showPoints && length === 1)) {
+        var l = c(time);
+        ctx.beginPath();
+        ctx.arc(l[0], l[1], 3, 0, 2 * Math.PI);
+        ctx.fillStyle = 'cyan';
+        ctx.fill();
+      }
     }
 
     return c;
