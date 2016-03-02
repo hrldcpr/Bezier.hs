@@ -1,3 +1,11 @@
+
+# Functor Hierarchy
+It's just more and more ways to make a `f a -> f b` function:
+
+    Functor     map :: (a -> b)   -> (f a -> f b)
+    Applicative <*> :: f (a -> b) -> (f a -> f b)
+    Monad       =<< :: (a -> f b) -> (f a -> f b)
+
 # Lines of Lines, Bézier Curves, and Haskell's Function Monad
 ![animated screenshot](https://x.st/images/bezier.gif)
 
