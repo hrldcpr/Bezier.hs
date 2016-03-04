@@ -6,6 +6,16 @@ It's just more and more ways to make a `f a -> f b` function:
     Applicative <*> :: f (a -> b) -> (f a -> f b)
     Monad       =<< :: (a -> f b) -> (f a -> f b)
 
+One thing that Applicative allows is mapping over multiple arguments, e.g.:
+
+    f t = t
+    g t = 1 - t
+    (*) <$> f :: Parametric (a -> a)
+    (*) <$> f <*> g :: Parametric a
+
+(whereas with just `map` aka `<$>` there is no way to incorporate the second argument as in the final `<*>` step above)
+
+
 # Lines of Lines, Bézier Curves, and Haskell's Function Monad
 ![animated screenshot](https://x.st/images/bezier.gif)
 
