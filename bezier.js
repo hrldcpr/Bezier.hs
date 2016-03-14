@@ -4,13 +4,6 @@
 // # curves = (n - 1) + (n - 2) + … + 1 = (n - 1) * n / 2 = 1, 3, 6, 10, 15, …
 // # lines = (n - 2) + (n - 3) + … + 1 = (n - 2) * (n - 1) / 2 = 0, 1, 3, 6, 10, …
 
-var showAllPoints = true;
-var showPoints = true;
-var showAllLines = true;
-var showLines = true;
-var showAllCurves = true;
-var showCurve = true;
-
 (function(window, document, undefined) {
 
   function constant(x) {
@@ -39,6 +32,12 @@ var showCurve = true;
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
 
+  var showAllPoints;
+  var showPoints;
+  var showAllLines;
+  var showLines;
+  var showAllCurves;
+  var showCurve;
   var points;
   var time;
   var beziers = {};
@@ -101,11 +100,23 @@ var showCurve = true;
     window.requestAnimationFrame(animate);
   }
 
+  function setOptions() {
+    showAllPoints = !location.hash.includes('!showAllPoints');
+    showPoints = location.hash.includes('showPoints');
+    showAllLines = !location.hash.includes('!showAllLines');
+    showLines = location.hash.includes('showLines');
+    showAllCurves = !location.hash.includes('!showAllCurves');
+    showCurve = location.hash.includes('showCurve');
+  }
+
   canvas.addEventListener('click', function(event) {
     beziers = {};  // clear all caches
     points.push([event.offsetX, event.offsetY]);
   });
 
+  window.addEventListener('hashchange', setOptions);
+
+  setOptions();
   points = [[100, 500], [500, 100]];
   window.requestAnimationFrame(animate);
 
