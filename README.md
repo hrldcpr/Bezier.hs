@@ -213,6 +213,26 @@ bezier ps  = join $ line <$> bezier (init ps) <*> bezier (tail ps)
 The `join` is unfortunate, but is necessary because `line` takes two arguments, which doesn't play perfectly with the applicative machinery. The fact that we have to resort to `join` also shows that `Parametric` is more than just an applicative functor, since purely applicative functors can't be joined, only monadic ones can.
 
 
+## Speeding Things Up
+
+For *n* points, the current algorithm recurses *n* times, branching into 2 calls at each step, which means it runs in exponential time!
+
+When we look at a Bézier curve as the line between two other Bézier curves, it's not obvious how to avoid this.
+![aniation of n-point curve as two (n-1)-point curves](TODO)
+
+However, splitting an *n*-point curve into two completely separate *(n-1)*-point curves ignores the fact that there is lots of overlap between those two curves. If instead we look at things in terms of lines, it becomes clear that *at a fixed time* any *n*-point curve can be reduced to an *n-1* point curve, which it meets at that time.
+![animation of n-point curve meeting varying (n-1)-point curves at a point](TODO)
+
+This approach is called De Casteljau's algorithm, and takes us from exponential time down to quadratic time, which can be seen if you chart out the recursion in both approaches.
+![exponential tree versus quadratic overlapping tree / triangle]()
+
+```haskell
+bezier :: [Point] -> Parametric Point
+bezier [p] = return p
+bezier ps  = bezier =<< zipWithM line ps (tail ps)
+```
+
+
 # Bezier.hs
 
 A quick demonstration of how simple Bezier curves are, and how easily you can implement them in Haskell.
