@@ -16,7 +16,7 @@ line p q = zipWithM line1d p q
 -- bezier of one point is fixed at that point, and bezier of n points is the
 -- line between bezier of first n-1 points and bezier of last n-1 points
 bezier :: [Point] -> Parametric Point
-bezier [p] = const p
+bezier [p] = return p
 bezier ps  = do p <- bezier (init ps)
                 q <- bezier (tail ps)
                 line p q
