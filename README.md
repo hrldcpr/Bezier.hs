@@ -223,7 +223,7 @@ When we look at a Bézier curve as the line between two other Bézier curves, it
 However, splitting an *n*-point curve into two completely separate *(n-1)*-point curves ignores the fact that there is lots of overlap between those two curves. If instead we look at things in terms of lines, it becomes clear that *at a fixed time* any *n*-point curve can be reduced to an *n-1* point curve, which it meets at that time.
 ![animation of n-point curve meeting varying (n-1)-point curves at a point](TODO)
 
-This approach is called De Casteljau's algorithm, and takes us from exponential time down to quadratic time, which can be seen if you chart out the recursion in both approaches.
+This approach is called de Casteljau's algorithm, and takes us from exponential time down to quadratic time, which can be seen if you chart out the recursion in both approaches.
 ![exponential tree versus quadratic overlapping tree / triangle]()
 
 ```haskell
