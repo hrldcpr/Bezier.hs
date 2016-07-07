@@ -117,7 +117,7 @@
   window.addEventListener('hashchange', setOptions);
 
   setOptions();
-  points = [[300, 300]];
+  points = [[600, 300]];
   window.requestAnimationFrame(animate);
 
 })(this, this.document);
