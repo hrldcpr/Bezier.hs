@@ -99,5 +99,5 @@ line1d a b = \t -> (1 - t)*a + t*b
 --
 
 bezier :: [Point] -> Parametric Point
-bezier [p] = p
+bezier [p] = return p
 bezier ps = bezier =<< zipWithM line ps (tail ps)
