@@ -19,9 +19,9 @@ line1d a b = \t -> (1.0 - t)*a + t*b
 line :: Point -> Point -> Parametric Point
 line p q = Array.zipWithA line1d p q
 
--- bezier of one point is fixed at that point, and bezier of n points is the
--- line between bezier of first n-1 points and bezier of last n-1 points
--- TODO use non-empty list of points? and use PatternSynonyms to match on either Cons a [a] or Cons' a (Maybe (Cons a))
+-- bezier of one point is fixed at that point, and at time t,
+-- bezier of n points is bezier of the points at time t along
+-- the n-1 lines between the points
 bezier :: NonEmpty Array Point -> Parametric Point
 bezier ps = case tail' ps of
   Nothing -> pure $ head ps
