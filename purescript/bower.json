@@ -1,5 +1,5 @@
 {
-  "name": "purescript",
+  "name": "bezier",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -7,7 +7,9 @@
     "output"
   ],
   "dependencies": {
-    "purescript-console": "^1.0.0"
+    "purescript-console": "^1.0.0",
+    "purescript-arrays": "^1.1.0",
+    "purescript-nonempty": "^1.1.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^1.0.0"
