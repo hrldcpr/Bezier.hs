@@ -5,7 +5,7 @@ import Data.Array (zipWithA) as Array
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty, head, tail)
 
-import NonEmpty (forArray, zipWithA, fromArray)
+import Data.NonEmpty.Array (forArray, zipWithA, fromArray)
 
 
 type Point = Array Number  -- a multi-dimensional coordinate

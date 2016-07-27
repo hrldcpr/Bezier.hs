@@ -1,4 +1,4 @@
-module NonEmpty where
+module Data.NonEmpty.Array where
 
 import Prelude
 import Data.Array (uncons)
