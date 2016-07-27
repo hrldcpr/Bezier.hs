@@ -4,7 +4,7 @@ import Prelude
 import Data.Array (uncons)
 import Data.Array (zipWith) as Array
 import Data.Maybe (Maybe(..))
-import Data.NonEmpty (NonEmpty, (:|))
+import Data.NonEmpty (NonEmpty, tail, (:|))
 import Data.Traversable (sequence)
 
 
@@ -21,3 +21,6 @@ zipWith f (x:|xs) (y:|ys) = f x y :| Array.zipWith f xs ys
 
 zipWithA :: forall f a b c. Applicative f => (a -> b -> f c) -> NonEmpty Array a -> NonEmpty Array b -> f (NonEmpty Array c)
 zipWithA f xs ys = sequence $ zipWith f xs ys
+
+tail' :: forall a. NonEmpty Array a -> Maybe (NonEmpty Array a)
+tail' = tail >>> fromArray

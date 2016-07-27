@@ -3,9 +3,9 @@ module Bezier where
 import Prelude
 import Data.Array (zipWithA) as Array
 import Data.Maybe (Maybe(..))
-import Data.NonEmpty (NonEmpty, head, tail)
+import Data.NonEmpty (NonEmpty, head)
 
-import Data.NonEmpty.Array (forArray, zipWithA, fromArray)
+import Data.NonEmpty.Array (forArray, tail', zipWithA)
 
 
 type Point = Array Number  -- a multi-dimensional coordinate
@@ -23,8 +23,8 @@ line p q = Array.zipWithA line1d p q
 -- line between bezier of first n-1 points and bezier of last n-1 points
 -- TODO use non-empty list of points? and use PatternSynonyms to match on either Cons a [a] or Cons' a (Maybe (Cons a))
 bezier :: NonEmpty Array Point -> Parametric Point
-bezier ps = case fromArray (tail ps) of
-  Nothing -> pure (head ps)
+bezier ps = case tail' ps of
+  Nothing -> pure $ head ps
   Just tail -> bezier =<< zipWithA line ps tail
 
 maybezier :: Array Point -> Maybe (Parametric Point)
