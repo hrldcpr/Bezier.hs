@@ -9,7 +9,9 @@
   "dependencies": {
     "purescript-console": "^1.0.0",
     "purescript-arrays": "^1.1.0",
-    "purescript-nonempty": "^1.1.0"
+    "purescript-nonempty": "^1.1.0",
+    "purescript-canvas": "^1.0.0",
+    "purescript-integers": "^1.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^1.0.0"
