@@ -1,18 +1,20 @@
 module Main where
 
 import Prelude
-import Control.Monad.Eff.Console (CONSOLE, log)
+import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Eff (Eff)
-import Data.Array
+import Data.Array (range)
 import Data.Foldable (class Foldable, for_)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe, maybe)
 import Data.NonEmpty (NonEmpty, (:|))
-import Graphics.Canvas
-import Math
+import Graphics.Canvas (CANVAS, CanvasElement, Context2D,
+                        getCanvasElementById, fillPath, setFillStyle, strokePath, setStrokeStyle,
+                        clearRect, getCanvasDimensions, getContext2D, moveTo, lineTo, arc)
+import Math (cos, pi)
 
-import Animation
-import Bezier (Parametric, Point, bezier, line2d)
+import Animation (ANIMATION, Milliseconds, requestAnimationFrame)
+import Bezier (Point, bezier, line2d)
 import Data.NonEmpty.Array (tail', zipWithA)
 
 
