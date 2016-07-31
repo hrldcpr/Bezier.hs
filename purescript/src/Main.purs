@@ -9,8 +9,8 @@ import Data.Int (toNumber)
 import Data.Maybe (Maybe, maybe)
 import Data.NonEmpty (NonEmpty, (:|))
 import Graphics.Canvas (CANVAS, CanvasElement, Context2D,
-                        getCanvasElementById, fillPath, setFillStyle, strokePath, setStrokeStyle,
-                        clearRect, getCanvasDimensions, getContext2D, moveTo, lineTo, arc)
+                        arc, clearRect, fillPath, getCanvasDimensions, getCanvasElementById,
+                        getContext2D, lineTo, moveTo, setFillStyle, setStrokeStyle, strokePath)
 import Math (cos, pi)
 
 import Animation (ANIMATION, Milliseconds, requestAnimationFrame)
