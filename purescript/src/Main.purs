@@ -49,5 +49,4 @@ main = do
   case c of
     Nothing -> pure unit
     Just canvas -> do
-      requestAnimationFrame $ draw canvas
-      pure unit
+      void $ requestAnimationFrame $ draw canvas
