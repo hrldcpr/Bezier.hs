@@ -13,14 +13,13 @@ import Math
 
 import Animation
 import Bezier (Parametric, Point, bezier, line2d)
-import Data.NonEmpty.Array (tail', toArray, zipWithA)
+import Data.NonEmpty.Array (tail', zipWithA)
 
 
 maybeDo :: forall eff a b. Maybe a -> (a -> Eff eff b) -> Eff eff Unit
 maybeDo x f = maybe (pure unit) (f >>> void) x
 
 points :: NonEmpty Array Point
--- points = { x: 100.0, y: 100.0 } :| [{ x: 300.0, y: 100.0}, { x: 300.0, y: 300.0}, { x: 300.0, y: 500.0}, { x: 500.0, y: 500.0 }]
 points = { x: 100.0, y: 500.0 } :| [{ x: 100.0, y: 100.0}, { x: 300.0, y: 100.0 }, { x: 500.0, y: 300.0}, { x: 400.0, y: 500.0 }]
 
 steps :: Int -> Array Number
