@@ -1,7 +1,7 @@
 module Data.NonEmpty.Array where
 
 import Prelude
-import Data.Array (uncons)
+import Data.Array (uncons, (:))
 import Data.Array (zipWith) as Array
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty, tail, (:|))
@@ -12,6 +12,9 @@ fromArray :: forall a. Array a -> Maybe (NonEmpty Array a)
 fromArray xs = case uncons xs of
   Nothing -> Nothing
   Just {head: x, tail: xs} -> Just (x :| xs)
+
+toArray :: forall a. NonEmpty Array a -> Array a
+toArray (x :| xs) = x : xs
 
 forArray :: forall a b. (NonEmpty Array a -> b) -> Array a -> Maybe b
 forArray f = fromArray >>> map f

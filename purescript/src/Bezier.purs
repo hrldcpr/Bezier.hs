@@ -15,8 +15,8 @@ line1d :: Number -> Number -> Parametric Number
 line1d a b = \t -> (1.0 - t)*a + t*b
 
 -- line between two points is linear interpolation on each dimension
-line :: Point -> Point -> Parametric Point
-line p q t = { x: line1d p.x q.x t, y: line1d p.y q.y t }
+line2d :: Point -> Point -> Parametric Point
+line2d p q t = { x: line1d p.x q.x t, y: line1d p.y q.y t }
 
 -- bezier of one point is fixed at that point, and at time t,
 -- bezier of n points is bezier of the points at time t along
@@ -24,7 +24,7 @@ line p q t = { x: line1d p.x q.x t, y: line1d p.y q.y t }
 bezier :: NonEmpty Array Point -> Parametric Point
 bezier ps = case tail' ps of
   Nothing -> pure $ head ps
-  Just tail -> bezier =<< zipWithA line ps tail
+  Just tail -> bezier =<< zipWithA line2d ps tail
 
 maybezier :: Array Point -> Maybe (Parametric Point)
 maybezier = forArray bezier
