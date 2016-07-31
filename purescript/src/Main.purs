@@ -47,13 +47,10 @@ draw canvas time = void do
         strokePath ctx $ line ctx ps
 
         setStrokeStyle "cyan" ctx
-        let curve = bezier ps
-            samples = curve <$> steps 100
-        strokePath ctx $ line ctx samples
+        strokePath ctx $ line ctx $ bezier ps <$> steps 100
 
         setFillStyle "black" ctx
-        for_ ps \p -> do
-          fillPath ctx $ circle ctx { x: p.x, y: p.y, r: 3.0 }
+        for_ ps \p -> fillPath ctx $ circle ctx { x: p.x, y: p.y, r: 3.0 }
 
         maybeDo (tail' ps) \tl -> go $ zipWithA line2d ps tl $ t
   go points
