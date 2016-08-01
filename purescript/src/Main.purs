@@ -18,8 +18,11 @@ import Bezier (Point, bezier, line2d)
 import Data.NonEmpty.Array (tail', zipWithA)
 
 
+doMaybe :: forall eff a b. (a -> Eff eff b) -> Maybe a -> Eff eff Unit
+doMaybe f = maybe (pure unit) (f >>> void)
+
 maybeDo :: forall eff a b. Maybe a -> (a -> Eff eff b) -> Eff eff Unit
-maybeDo x f = maybe (pure unit) (f >>> void) x
+maybeDo = flip doMaybe
 
 points :: NonEmpty Array Point
 points = { x: 100.0, y: 500.0 } :| [{ x: 100.0, y: 100.0}, { x: 300.0, y: 100.0 }, { x: 500.0, y: 300.0}, { x: 400.0, y: 500.0 }]
@@ -60,6 +63,4 @@ draw canvas time = void do
   requestAnimationFrame $ draw canvas
 
 main :: Eff (animation :: ANIMATION, canvas :: CANVAS, console :: CONSOLE) Unit
-main = do
-  canvas <- getCanvasElementById "canvas"
-  maybeDo canvas \c -> requestAnimationFrame $ draw c
+main = getCanvasElementById "canvas" >>= doMaybe (requestAnimationFrame <<< draw)
