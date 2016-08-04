@@ -2,7 +2,7 @@
 # Functor Hierarchy
 It's just more and more ways to make a `f a -> f b` function:
 ```haskell
-Functor     map :: (a -> b)   -> (f a -> f b)
+Functor     <$> ::   (a -> b) -> (f a -> f b)
 Applicative <*> :: f (a -> b) -> (f a -> f b)
 Monad       =<< :: (a -> f b) -> (f a -> f b)
 ```
