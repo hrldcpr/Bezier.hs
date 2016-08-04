@@ -18,6 +18,10 @@ line p q = zipWithM line1d p q
 -- TODO use non-empty list of points? and use PatternSynonyms to match on either Cons a [a] or Cons' a (Maybe (Cons a))
 bezier :: [Point] -> Parametric Point
 bezier [p] = return p
-bezier ps  = do p <- bezier (init ps)
-                q <- bezier (tail ps)
-                line p q
+bezier ps  = bezier =<< zipWithM line ps (tail ps)
+
+bezier_slow :: [Point] -> Parametric Point
+bezier_slow [p] = return p
+bezier_slow ps  = do p <- bezier (init ps)
+                     q <- bezier (tail ps)
+                     line p q
