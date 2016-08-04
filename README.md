@@ -226,6 +226,8 @@ However, splitting an *n*-point curve into two completely separate *(n-1)*-point
 This approach is called de Casteljau's algorithm, and takes us from exponential time down to quadratic time, which can be seen if you chart out the recursion in both approaches.
 ![exponential tree versus quadratic overlapping tree / triangle]()
 
+TODO Note that the quadratic algorithm is equivalent to memoization of the exponential algorithm.
+
 ```haskell
 bezier :: [Point] -> Parametric Point
 bezier [p] = return p
